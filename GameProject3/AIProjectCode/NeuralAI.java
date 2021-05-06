@@ -1,7 +1,8 @@
-package AIProject3;
+package AIProjectCode;
 
-import ProjectThreeEngine.GameState;
-import ProjectThreeEngine.Player;
+import java.util.ArrayList;
+
+import ProjectThreeEngine.*;
 
 //TODO: figure out how to assess Fitness and save out the output to use in the next game
 public class NeuralAI implements Player
@@ -10,14 +11,15 @@ public class NeuralAI implements Player
     final int SIZE = 20;
     final int hidden_nodes = 16;
     final int hidden_layers = 2;
-    float mutationRate = 0.05;
+    float mutationRate = 0.05f;
     NeuralNet brain;
     GameState curState;
+    float[] vision;
     float[] decision;
 
-    ArrayList<Food> foodList;  //list of food positions (used to replay the best snake)
+    ArrayList<FoodPiece> foodList;  //list of food positions (used to replay the best snake)
     
-    Food food;
+    FoodPiece food;
     int score = 3;
     
 
@@ -34,10 +36,10 @@ public class NeuralAI implements Player
         curState = init_state;
 
 //ADD INPUTS AND PREPROCESSING HERE
-        vision = new float[24];               //makes an array of floats for vision
+       vision = new float[24];               //makes an array of floats for vision
         
         decision = new float[4];              //decision is a vector of 4 directions to move
-        ArrayList<Food> foodList;  //list of food positions (used to replay the best snake)
+        ArrayList<FoodPiece> foodList;  //list of food positions (used to replay the best snake)
 
 
 //WARNING: Brain is hardcoded for 24 inputs from vision
@@ -46,8 +48,8 @@ public class NeuralAI implements Player
 //if have model, load up model into brain
         
 //NOt sure if needed
-        foodList = new ArrayList<Food>();
-        foodList.add(new food());
+        foodList = new ArrayList<FoodPiece>();
+        //foodList.add(new FoodPiece());
         
     }
 
@@ -64,11 +66,11 @@ public class NeuralAI implements Player
         //pop.naturalSelection();
     }
 
-    boolean foodCollide(GameState state, float x, float y)
+    boolean foodCollide(GameState state, int x, int y)
      {  
         return state.isFood(x, y);
      }
-     GamePiece checkCollision(GameState state, float x, float y)
+     GamePiece checkCollision(GameState state, int x, int y)
      {
          return state.getPiece(x, y);
      }
@@ -83,7 +85,7 @@ public class NeuralAI implements Player
      }
     
  //IMPORTANT: Calculate efficacy of snake
-     void calculateFitness() 
+    /* void calculateFitness() 
      {  //calculate the fitness of the snake
         if(score < 10) 
         {
@@ -94,7 +96,7 @@ public class NeuralAI implements Player
            fitness *= Math.pow(2,10);
            fitness *= (score-9);
         }
-     }
+     }*/
 
     ///////////////////Basic Nerual Net Working Logic
 //IMPORTANT: checks surroundings    
@@ -123,22 +125,22 @@ public class NeuralAI implements Player
           vision[10] = temp[1];
           vision[11] = temp[2];
 
-          temp = lookInDiagonal(state, 0, 0);        //up left
+          temp = lookDiagonal(state, 0, 0);        //up left
           vision[12] = temp[0];
           vision[13] = temp[1];
           vision[14] = temp[2];
           
-          temp = lookInDiagonal(state, 12, 0);     //up right
+          temp = lookDiagonal(state, 12, 0);     //up right
           vision[15] = temp[0];
           vision[16] = temp[1];
           vision[17] = temp[2];
           
-          temp = lookInDiagonal(state, 0,12);      //down left
+          temp = lookDiagonal(state, 0,12);      //down left
           vision[18] = temp[0];
           vision[19] = temp[1];
           vision[20] = temp[2];
           
-          temp = lookInDiagonal(state, 12, 12);    //down right
+          temp = lookDiagonal(state, 12, 12);    //down right
           vision[21] = temp[0];
           vision[22] = temp[1];
           vision[23] = temp[2];
@@ -148,10 +150,10 @@ public class NeuralAI implements Player
       {  //look in a direction and check for food, body and wall
         
         float look[] = new float[3];
-        float distance = 1;
-        HeadPiece head = state.getSnake(my_num).head;
-        float x = head.getX();
-        float y = head.getY();
+        int distance = 1;
+        HeadPiece head = state.getSnake(my_num).getHead(); 
+        int x = head.getX();
+        int y = head.getY();
 
         if(isYaxis)
         {
@@ -262,13 +264,13 @@ public class NeuralAI implements Player
         return look;
     }
 
-    float[] lookDiagonal(GameState state, float endX, float endY)
+    float[] lookDiagonal(GameState state, int endX, int endY)
     {
       float look[] = new float[3];
-      float distance = 1;
-      HeadPiece head = state.getSnake(my_num).head;
-      float x = head.getX();
-      float y = head.getY();
+      int distance = 1;
+      HeadPiece head = state.getSnake(my_num).getHead(); 
+      int x = head.getX();
+      int y = head.getY();
 
       if(x > endX)    //up 
       {
@@ -393,21 +395,19 @@ public class NeuralAI implements Player
           switch(maxIndex) {
              case 0:
                return DirType.North;
-               break;
              case 1:
                return DirType.South;
-               break;
              case 2:
                return DirType.West;
-               break;
              case 3: 
                return DirType.East;
-               break;
+              default:
+                return null;
           }
       }
 
 //file saving parts: change until we got something that saves
-    void fileSelectedIn(File selection)    //loads in a file to fill the hidden node values so as to use saved data 
+   /* void fileSelectedIn(File selection)    //loads in a file to fill the hidden node values so as to use saved data 
     {
         if (selection == null) 
         {
@@ -516,7 +516,7 @@ public class NeuralAI implements Player
           saveTable(modelTable, path);
           
         }
-      }
+      }*/
       
 }
 

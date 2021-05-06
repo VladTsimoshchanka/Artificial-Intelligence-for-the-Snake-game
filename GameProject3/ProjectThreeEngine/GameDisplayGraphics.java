@@ -13,8 +13,8 @@ class GameDisplayGraphics{
     public static int SIZE_TALL = 840;
     public static int SIZE_WIDE = 1200;
     public static int MARGIN = 0;
-    public static int BOX_TALL = 70;
-    public static int BOX_WIDE = 70;
+    public static int BOX_TALL = 55;
+    public static int BOX_WIDE = 55;
     public static double LINE_WIDE = 4;
     static int FONT_SIZE = 30;
     static GraphicsContext gc;

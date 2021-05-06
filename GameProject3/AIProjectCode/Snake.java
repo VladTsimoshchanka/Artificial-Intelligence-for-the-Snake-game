@@ -1,9 +1,9 @@
-package AIProject3;
+package AIProjectCode;
 
 import java.util.ArrayList;
-
+//for reference only
 class Snake {
-   
+   /*
     int score = 1;
     int lifeLeft = 200;  //amount of moves the snake can make before it dies
     int lifetime = 0;  //amount of time the snake has been alive
@@ -128,7 +128,7 @@ class Snake {
             dead = true;
          }
        }
-    }*/
+    }
 
 //portentially useful
     void eat() {  //eat food
@@ -344,5 +344,5 @@ class Snake {
       if(xVel!=-SIZE) {
         xVel = SIZE; yVel = 0;
       }
-    }
+    }*/
   }

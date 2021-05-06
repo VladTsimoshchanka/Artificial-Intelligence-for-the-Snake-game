@@ -1,4 +1,4 @@
-package AIProject3;
+package AIProjectCode;
 
 //https://github.com/greerviau/SnakeAI/tree/master/SnakeAI
 class NeuralNet 

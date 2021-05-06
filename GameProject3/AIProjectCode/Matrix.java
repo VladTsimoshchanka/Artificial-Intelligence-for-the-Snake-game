@@ -1,4 +1,4 @@
-package AIProject3;
+package AIProjectCode;
 
 import java.util.Random;
 

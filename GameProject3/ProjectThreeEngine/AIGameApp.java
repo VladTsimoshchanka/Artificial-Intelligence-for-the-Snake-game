@@ -3,8 +3,8 @@
 // 2) Change the lines inside start that say:
 //      Player_0 =
 //      Player_1 =
-package ProjectThreeEngine;
 
+package ProjectThreeEngine;
 
 
 import javafx.application.Application;
@@ -26,6 +26,8 @@ import javafx.scene.input.MouseEvent;
 import java.util.List;
 import java.util.ArrayList;
 
+import AIProjectCode.*;
+
 public class AIGameApp extends Application{
     Player Player_0;
     Player Player_1;
@@ -39,7 +41,7 @@ public class AIGameApp extends Application{
 
     public void start(Stage primaryStage){
 	//IMPORTANT : Change these lines to change who is playing!
-	Player_0 = new RandomPlayer();
+	Player_0 = new NeuralAI();
 	Player_1 =  new RandomPlayer();
 
 

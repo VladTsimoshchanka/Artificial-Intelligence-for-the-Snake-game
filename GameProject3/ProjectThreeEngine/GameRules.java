@@ -42,11 +42,25 @@ public class GameRules{
 	    Snake sn_i = state.getSnake(i);
 	    for(int j=0; j < state.getNumPlayers(); j++){
 		Snake sn_j = state.getSnake(j);
-		
+
 		if( sn_j.isPresent( sn_i.head.getX(), sn_i.head.getY()) ){
-		    collide = true;
+		    if( ! (i == j) ){
+			collide = true;
+		    }
+
 		}
 	    }
+
+
+	    // Checks I's body to see if it ran itself over
+	    for (SnakePiece b : sn_i.body) {
+		if (b.getX() == sn_i.head.getX() && b.getY() == sn_i.head.getY()) {
+		    collide = true;
+		    state.game_over = true;
+		    state.game_winner = 1-i;
+		}
+	    }
+	    
 	    if( sn_i.head.getX() < 0 || sn_i.head.getX() == state.max_x){
 		collide = true;
 	    }

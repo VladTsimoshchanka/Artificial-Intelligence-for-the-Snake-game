@@ -20,11 +20,11 @@ public class GameState {
 
     String[] names;
 
-    final int max_x = 12;
-    final int max_y = 12;
-    final int start_len = 3;
-    final int max_food = 3;
-    final int num_players = 2;
+    public final int max_x = 15;
+    public final int max_y = 15;
+    public final int start_len = 3;
+    public final int max_food = 5;
+    public final int num_players = 2;
     
     static public GameState concedeState(GameState old, int play_num){
 	GameState state = new GameState(old);
@@ -157,7 +157,7 @@ public class GameState {
 
 	names = new String[2];
 	names[0] = old.getPlayName(0);
-	names[1] = old.getPlayName(0);
+	names[1] = old.getPlayName(1);
 
 	snakes = new Snake[2];
 	snakes[0] = new Snake( old.getSnake(0) );

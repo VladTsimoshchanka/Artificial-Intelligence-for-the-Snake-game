@@ -9,9 +9,21 @@ public class Snake {
     HeadPiece head;
     int max_len;
 
+    public HeadPiece getHead(){
+	return head;
+    }
+
+    public List<SnakePiece> getBody(){
+	return body;
+    }
+    
     public boolean isPresent(int x, int y){
 	boolean found = false;
 
+	if((head.getX() == x) && (head.getY() == y)){
+	    found = true;
+	}
+	
 	for(SnakePiece piece: body){
 	    if( piece.getX() == x && piece.getY() == y){
 		found = true;

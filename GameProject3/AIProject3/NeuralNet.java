@@ -29,57 +29,64 @@ class NeuralNet
     
     void mutate(float mr) 
     {
-       for(Matrix w : weights) {
-          w.mutate(mr); 
+       for(Matrix w : weights) 
+       {
+          w.mutate(mr);             //mutates each weight index by a given threshold that may or may not be crossed by random number
        }
     }
     
-    float[] output(float[] inputsArr) {
-       Matrix inputs = weights[0].singleColumnMatrixFromArray(inputsArr);
+    float[] output(float[] inputsArr) 
+    {
+       Matrix inputs = weights[0].singleColumnMatrixFromArray(inputsArr);  //makes a single column input value matrix
        
-       Matrix curr_bias = inputs.addBias();
+       Matrix curr_bias = inputs.addBias();                                   //adds a row of 1s to the input values
        
        for(int i=0; i<hLayers; i++) {
-          Matrix hidden_ip = weights[i].dot(curr_bias); 
-          Matrix hidden_op = hidden_ip.activate();
-          curr_bias = hidden_op.addBias();
+          Matrix hidden_ip = weights[i].dot(curr_bias);           //for each hidden layer in the matrix, dot the weights with the currentBias
+          Matrix hidden_op = hidden_ip.activate();                //makes the product matrix all positive values or 0's
+          curr_bias = hidden_op.addBias();                        //updates the currBias and adds a row of 1's to it for dot producting again
        }
        
-       Matrix output_ip = weights[weights.length-1].dot(curr_bias);
-       Matrix output = output_ip.activate();
+       Matrix output_ip = weights[weights.length-1].dot(curr_bias);     //dot product the outputs with the current bias
+       Matrix output = output_ip.activate();                            //makes all the weights positive
        
-       return output.toArray();
+       return output.toArray();                                          //outputs the matrix to an array
     }
     
-    NeuralNet crossover(NeuralNet partner) {
-       NeuralNet child = new NeuralNet(iNodes,hNodes,oNodes,hLayers);
+    NeuralNet crossover(NeuralNet partner) 
+    {
+       NeuralNet child = new NeuralNet(iNodes,hNodes,oNodes,hLayers);      //makes a new child neural net, and copies over a random amount of the original and the rest the partner
        for(int i=0; i<weights.length; i++) {
-          child.weights[i] = weights[i].crossover(partner.weights[i]);
+          child.weights[i] = weights[i].crossover(partner.weights[i]);        
        }
        return child;
     }
     
-    NeuralNet clone() {
+    NeuralNet Clone() {
        NeuralNet clone = new NeuralNet(iNodes,hNodes,oNodes,hLayers);
        for(int i=0; i<weights.length; i++) {
-          clone.weights[i] = weights[i].clone(); 
+          clone.weights[i] = weights[i].Clone(); 
        }
        
        return clone;
     }
     
+    //fills the wieghts matrix with a new provided matrix
     void load(Matrix[] weight) {
         for(int i=0; i<weights.length; i++) {
            weights[i] = weight[i]; 
         }
     }
     
+    //returns a copy of the weights
     Matrix[] pull() {
        Matrix[] model = weights.clone();
        return model;
     }
     
-    void show(float x, float y, float w, float h, float[] vision, float[] decision) {
+    //don't think this is nexessary
+    /*void show(float x, float y, float w, float h, float[] vision, float[] decision) 
+    {
        float space = 5;
        float nSize = (h - (space*(iNodes-2))) / iNodes;
        float nSpace = (w - (weights.length*nSize)) / weights.length;
@@ -183,4 +190,5 @@ class NeuralNet
        text("L",x+(lc*nSize)+(lc*nSpace)+nSize/2,y+oBuff+(2*space)+(2*nSize)+(nSize/2));
        text("R",x+(lc*nSize)+(lc*nSpace)+nSize/2,y+oBuff+(3*space)+(3*nSize)+(nSize/2));
     }
+    */
   }

@@ -1,0 +1,40 @@
+each mvoe returns a DirType North, East, West, South
+
+foodPiece has getX and getY
+
+state.getSnake(0) and state.getSnake(1) will get you the snake in the state
+snake.head.getX and getY will get you the position and orientation of head
+
+	for(SnakePiece p : sn.body) how to get the current gameState's bodylocation
+
+    for(FoodPiece f : state.getFoods()) f.getX and f.getY will get you all the food positions
+
+    snake.incMaxLen
+
+    
+// Note: Y = 0 Is the North (Top) part of the board
+// Note: X = 0 is the West (Left) part of the board
+// Board positions are null unless there is a Piece present
+
+max_x and max_Y for other end of board
+
+start length = 3
+
+maxFood on board is 3
+
+getPIece(int x, int y) will either return foodPiece, snake head, or snake body
+
+bool isFood(int x, int y) returns true if there is food there
+
+
+
+IMPLEMENT THESE
+  //This function is called when the game starts
+    public void begin(GameState init_state, int play_num);
+
+    //You can return null to just keep going straight
+    public DirType getMove(GameState state);
+
+    public String getPlayName();
+
+    in Player getMove() can return null to keep going straight

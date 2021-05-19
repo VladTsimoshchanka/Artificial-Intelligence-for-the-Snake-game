@@ -1,9 +1,10 @@
 package AIProjectCode;
 
 import java.util.ArrayList;
+import ProjectThreeEngine.*;
 //for reference only
 class Snake {
-   /*
+   
     int score = 1;
     int lifeLeft = 200;  //amount of moves the snake can make before it dies
     int lifetime = 0;  //amount of time the snake has been alive
@@ -18,17 +19,17 @@ class Snake {
     float[] vision;  //snakes vision
     float[] decision;  //snakes decision
     
-    PVector head;
+    HeadPiece head;
     
-    ArrayList<PVector> body;  //snakes body
-    ArrayList<Food> foodList;  //list of food positions (used to replay the best snake)
+    ArrayList<SnakePiece> body;  //snakes body
+    ArrayList<FoodPiece> foodList;  //list of food positions (used to replay the best snake)
     
-    Food food;
+    FoodPiece food;
     NeuralNet brain;
     
-    Snake() {
+    /*Snake() {
       this(hidden_layers);                 
-    }
+    }*/
     
     Snake(int layers)                           //makes a new snake with provided amount of hidden layers in neural network
     {
@@ -94,7 +95,7 @@ class Snake {
        }
        return false;
     }
-   /* 
+   
     void show() {  //show the snake
        food.show();
        fill(255);
@@ -344,5 +345,5 @@ class Snake {
       if(xVel!=-SIZE) {
         xVel = SIZE; yVel = 0;
       }
-    }*/
+    }
   }

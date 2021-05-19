@@ -18,7 +18,7 @@ class Population
        for(int i = 0; i < snakes.length; i++) {
           snakes[i] = new Snake(); 
        }
-       bestSnake = snakes[0].clone();
+       bestSnake = (Snake)snakes[0].clone();
        bestSnake.replay = true;
     }
     

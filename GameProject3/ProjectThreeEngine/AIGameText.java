@@ -5,7 +5,7 @@
 //      Player_1 =
 
 package ProjectThreeEngine;
-
+import AIProjectCode.BareSnake;
 import java.util.List;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -33,7 +33,7 @@ public class AIGameText{
 	
 	//IMPORTANT : Change these lines to change who is playing!
 	Player_0 = new RandomPlayer();
-	Player_1 =  new RandomPlayer();
+	Player_1 =  new BareSnake();
 
 
 	//Set up the names in the state object

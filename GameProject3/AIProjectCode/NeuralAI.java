@@ -16,9 +16,9 @@ public class NeuralAI implements Player
     GameState curState;
     float[] vision;
     float[] decision;
-
+    int lifetime = 0;
     ArrayList<FoodPiece> foodList;  //list of food positions (used to replay the best snake)
-    
+    float fitness = 0;
     FoodPiece food;
     int score = 3;
     
@@ -60,6 +60,7 @@ public class NeuralAI implements Player
         look(state);                         //how the snake AI runs
         DirType dir = think();
 //TODO: figure out how to assess Fitness and save out the output to use in the next game
+        lifetime++;
         return dir;
 
        // pop.calculateFitness();
@@ -85,7 +86,7 @@ public class NeuralAI implements Player
      }
     
  //IMPORTANT: Calculate efficacy of snake
-    /* void calculateFitness() 
+     void calculateFitness() 
      {  //calculate the fitness of the snake
         if(score < 10) 
         {
@@ -96,7 +97,7 @@ public class NeuralAI implements Player
            fitness *= Math.pow(2,10);
            fitness *= (score-9);
         }
-     }*/
+     }
 
     ///////////////////Basic Nerual Net Working Logic
 //IMPORTANT: checks surroundings    

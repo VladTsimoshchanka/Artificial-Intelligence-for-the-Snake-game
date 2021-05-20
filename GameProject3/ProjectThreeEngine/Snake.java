@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Snake {
     int play_num;
     List<SnakePiece> body;
-    public HeadPiece head;
+    HeadPiece head;
     int max_len;
 
     public HeadPiece getHead(){

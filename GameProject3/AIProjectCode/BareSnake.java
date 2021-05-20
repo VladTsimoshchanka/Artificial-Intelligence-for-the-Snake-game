@@ -13,27 +13,27 @@ public class BareSnake implements Player{
         }
     public DirType getMove(GameState state){	
         PossibleMoves.clear();
-        GamePiece onTheLeft = state.getPiece(state.getSnake(my_num).head.getX()-1, state.getSnake(my_num).head.getY());
-        GamePiece onTheRight = state.getPiece(state.getSnake(my_num).head.getX()+1, state.getSnake(my_num).head.getY());
-        GamePiece Up = state.getPiece(state.getSnake(my_num).head.getX(), state.getSnake(my_num).head.getY()-1);
-        GamePiece Down = state.getPiece(state.getSnake(my_num).head.getX(), state.getSnake(my_num).head.getY()+1);
+        GamePiece onTheLeft = state.getPiece(state.getSnake(my_num).getHead().getX()-1, state.getSnake(my_num).getHead().getY());
+        GamePiece onTheRight = state.getPiece(state.getSnake(my_num).getHead().getX()+1, state.getSnake(my_num).getHead().getY());
+        GamePiece Up = state.getPiece(state.getSnake(my_num).getHead().getX(), state.getSnake(my_num).getHead().getY()-1);
+        GamePiece Down = state.getPiece(state.getSnake(my_num).getHead().getX(), state.getSnake(my_num).getHead().getY()+1);
         if(onTheLeft == null || state.isFood(onTheLeft.getX(), onTheLeft.getY())){
-            if(state.getSnake(my_num).head.getX() > 0){
+            if(state.getSnake(my_num).getHead().getX() > 0){
                 PossibleMoves.add(DirType.West);
             }
         }
         if(onTheRight == null || state.isFood(onTheRight.getX(), onTheRight.getY())){
-            if(state.getSnake(my_num).head.getX() < 15){
+            if(state.getSnake(my_num).getHead().getX() < 15){
                 PossibleMoves.add(DirType.East);
             }
         }
         if(Up == null || state.isFood(Up.getX(), Up.getY())){
-            if(state.getSnake(my_num).head.getY() > 0){
+            if(state.getSnake(my_num).getHead().getY() > 0){
                 PossibleMoves.add(DirType.North);
             }
         }
         if(Down == null || state.isFood(Down.getX(), Down.getY())){
-            if(state.getSnake(my_num).head.getY() < 15){
+            if(state.getSnake(my_num).getHead().getY() < 15){
                 PossibleMoves.add(DirType.South);
             }
         }

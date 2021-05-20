@@ -8,16 +8,19 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 
 
 import ProjectThreeEngine.*;
-
+//rough implementation from :  https://github.com/greerviau/SnakeAI
+//can't get the read and write of training data to work
 //TODO: figure out how to assess Fitness and save out the output to use in the next game
 public class NeuralAI implements Player
 {
-    boolean loadBrain = false;         //st to true to load brain from file
+    boolean loadBrain = false;       //set to true to load brain from file
     int my_num;
     final int SIZE = 20;
     final int hidden_nodes = 16;
@@ -495,9 +498,10 @@ public class NeuralAI implements Player
 
  public void LoadFromFIle(String fileName) throws IOException
  {
-  Matrix[] newBrain = brain.pull();
-  float[][] weights = new float[hidden_nodes][25];   //brain dimensions
-  URL path = NeuralAI.class.getResource(fileName);
+  Matrix[] newBrain = brain.pull();   //dummy copy
+  float[][] weights = newBrain[0].matrix;   //brain dimensions
+  //Path path = Paths.get(fileName);
+  URL path = ClassLoader.getSystemResource(fileName);
   File f = new File(path.getFile());
   BufferedReader reader = new BufferedReader(new FileReader(f));
   String st;
@@ -513,7 +517,7 @@ public class NeuralAI implements Player
       }
       weights[currLine] = wRow;
      currLine++;
-     if(currLine == 25)         //i think this works
+     if(currLine == weights.length - 1)         //i think this works
     {
       newBrain[currMatrix].matrix = weights;
       currMatrix ++;
@@ -521,6 +525,8 @@ public class NeuralAI implements Player
     }
 
   }
+  //System.out.println("Old Brain " + brain.weights[0].matrix.length + " x, " + brain.weights[0].matrix[0].length + " y" );
+  //System.out.println("New Brain " + weights.length + " x, " + weights[0].length + " y" );
   brain.weights = newBrain;
   reader.close();;
     
@@ -531,18 +537,26 @@ public class NeuralAI implements Player
     BufferedWriter file_out;
     file_out = new BufferedWriter(new FileWriter( fileName));
     Matrix[] modelWeights = brain.pull();
-    float[][] weights = new float[modelWeights.length][];
-    for(int i=0; i<weights.length; i++) 
+    Matrix m;
+    float[][] weights = new float[modelWeights[0].matrix.length][modelWeights[0].matrix[0].length];
+
+    for(int i = 0; i < modelWeights.length; i++)
     {
-       weights[i] = modelWeights[i].toArray(); 
-    }
-    for(int i = 0; i <  weights[0].length -1; i++)          ///this s probably wrong dimensionally
-    {
-      for(int j = 0; j < modelWeights.length -1; j++)       //this is probably wrong dimensionally
-      {
-        file_out.write(weights[i][j] + ",");
-      }
-      file_out.newLine();
+        m = modelWeights[i];
+        weights = m.matrix;
+        for(int j = 0; j <  weights.length; j++)          ///this s probably wrong dimensionally
+        {
+          for(int k = 0; k < weights[j].length; k++)       //this is probably wrong dimensionally
+          {
+            if(loadBrain)
+            file_out.write(weights[k][j] + ",");
+          
+          }
+          file_out.newLine();
+       }
+   
+   
+      
     }
     file_out.close();
   }

@@ -52,6 +52,8 @@ class NeuralNet
        
        return output.toArray();                                          //outputs the matrix to an array
     }
+
+
     
     NeuralNet crossover(NeuralNet partner) 
     {

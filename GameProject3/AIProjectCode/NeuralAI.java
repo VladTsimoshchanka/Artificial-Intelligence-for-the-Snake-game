@@ -1,12 +1,23 @@
 package AIProjectCode;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+
+
 
 import ProjectThreeEngine.*;
 
 //TODO: figure out how to assess Fitness and save out the output to use in the next game
 public class NeuralAI implements Player
 {
+    boolean loadBrain = false;         //st to true to load brain from file
     int my_num;
     final int SIZE = 20;
     final int hidden_nodes = 16;
@@ -36,6 +47,21 @@ public class NeuralAI implements Player
     boolean modelLoaded = false;
     ArrayList<Integer> evolution;
     
+    NeuralAI()
+    {
+      brain = new NeuralNet(24,hidden_nodes,4,hidden_layers);    //in, hidden nodes, out, hiddenlayers 
+      if(loadBrain)
+      {
+        try 
+        {
+          LoadFromFIle("TrainingData.txt");
+        }
+         catch (Exception e) 
+         {
+          e.printStackTrace();
+        }
+      }
+    }
   
     //This function is called when the game starts
     public void begin(GameState init_state, int play_num)
@@ -51,8 +77,9 @@ public class NeuralAI implements Player
 
 
 //WARNING: Brain is hardcoded for 24 inputs from vision
-        brain = new NeuralNet(24,hidden_nodes,4,hidden_layers);    //in, hidden nodes, out, hiddenlayers 
-
+   
+  
+       
 //if have model, load up model into brain
         
 //NOt sure if needed
@@ -465,6 +492,65 @@ public class NeuralAI implements Player
     child.brain = brain.crossover(parent.brain);
     return child;
  }
+
+ public void LoadFromFIle(String fileName) throws IOException
+ {
+  Matrix[] newBrain = brain.pull();
+  float[][] weights = new float[hidden_nodes][25];   //brain dimensions
+  URL path = NeuralAI.class.getResource(fileName);
+  File f = new File(path.getFile());
+  BufferedReader reader = new BufferedReader(new FileReader(f));
+  String st;
+  int currLine = 0;
+  int currMatrix = 0;
+  while ((st = reader.readLine()) != null)
+  {
+      String[] weightRow = st.split(",");
+      float[] wRow = new float[weightRow.length];
+      for(int i = 0; i < weightRow.length ; i++)
+      {
+        wRow[i] = Float.parseFloat(weightRow[i]);
+      }
+      weights[currLine] = wRow;
+     currLine++;
+     if(currLine == 25)         //i think this works
+    {
+      newBrain[currMatrix].matrix = weights;
+      currMatrix ++;
+      currLine = 0;
+    }
+
+  }
+  brain.weights = newBrain;
+  reader.close();;
+    
+  }
+
+  public void WritetoFile(String fileName) throws IOException
+  {
+    BufferedWriter file_out;
+    file_out = new BufferedWriter(new FileWriter( fileName));
+    Matrix[] modelWeights = brain.pull();
+    float[][] weights = new float[modelWeights.length][];
+    for(int i=0; i<weights.length; i++) 
+    {
+       weights[i] = modelWeights[i].toArray(); 
+    }
+    for(int i = 0; i <  weights[0].length -1; i++)          ///this s probably wrong dimensionally
+    {
+      for(int j = 0; j < modelWeights.length -1; j++)       //this is probably wrong dimensionally
+      {
+        file_out.write(weights[i][j] + ",");
+      }
+      file_out.newLine();
+    }
+    file_out.close();
+  }
+
+
+ }
+
+
  /*
 //need to read in a file and get weight values 
    void fileSelectedIn(File selection)    //loads in a file to fill the hidden node values so as to use saved data 
@@ -578,7 +664,7 @@ public class NeuralAI implements Player
         }
       }*/
       
-}
+
 
 
 /////////////////////////////potential added things:

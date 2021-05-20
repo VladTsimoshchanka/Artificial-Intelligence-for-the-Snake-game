@@ -143,46 +143,7 @@ public class Training
         }
 
 
-        void fileSelectedOut(File selection) {
-  if (selection == null) {
-    println("Window was closed or the user hit cancel.");
-  } else {
-    String path = selection.getAbsolutePath();
-    Table modelTable = new Table();
-    Snake modelToSave = pop.bestSnake.clone();
-    Matrix[] modelWeights = modelToSave.brain.pull();
-    float[][] weights = new float[modelWeights.length][];
-    for(int i=0; i<weights.length; i++) {
-       weights[i] = modelWeights[i].toArray(); 
-    }
-    for(int i=0; i<weights.length; i++) {
-       modelTable.addColumn("L"+i); 
-    }
-    modelTable.addColumn("Graph");
-    int maxLen = weights[0].length;
-    for(int i=1; i<weights.length; i++) {
-       if(weights[i].length > maxLen) {
-          maxLen = weights[i].length; 
-       }
-    }
-    int g = 0;
-    for(int i=0; i<maxLen; i++) {
-       TableRow newRow = modelTable.addRow();
-       for(int j=0; j<weights.length+1; j++) {
-           if(j == weights.length) {
-             if(g < evolution.size()) {
-                newRow.setInt("Graph",evolution.get(g));
-                g++;
-             }
-           } else if(i < weights[j].length) {
-              newRow.setFloat("L"+j,weights[j][i]); 
-           }
-       }
-    }
-    saveTable(modelTable, path);
-    
-  }
-}
+
 
 
 

@@ -7,10 +7,10 @@ import javax.lang.model.util.ElementScanner14;
 
 import ProjectThreeEngine.*;
 import java.lang.Math;
-public class DeperadoSnake implements Player
+public class DesperadoSnake implements Player
 {
     int my_num;
-    List<Integer> enemyPLayerNumbers = new List<Integer>();
+    List<Integer> enemyPLayerNumbers = new ArrayList<Integer>();
 
     int perfectX;
     int perfectY;
@@ -68,7 +68,7 @@ public class DeperadoSnake implements Player
             e = true;
         else
             e = false;
-        if(closesY > headY)
+        if(closestY > headY)
             n = true;
         else    
             n = false;
@@ -120,7 +120,7 @@ public class DeperadoSnake implements Player
         
          
             Random rand = new Random();
-            DirType finalMove = PossibleMoves.get(rand.nextInt(givenList.size()));
+            DirType finalMove = PossibleMoves.get(rand.nextInt(PossibleMoves.size()));
             return finalMove;
                 
             

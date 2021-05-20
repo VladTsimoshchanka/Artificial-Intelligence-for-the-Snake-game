@@ -3,17 +3,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.lang.model.util.ElementScanner14;
+
 
 import ProjectThreeEngine.*;
 import java.lang.Math;
-public class DeperadoSnake implements Player
+public class DesperadoSnake implements Player
 {
     int my_num;
-    List<Integer> enemyPLayerNumbers = new List<Integer>();
+    ArrayList<Integer> enemyPLayerNumbers = new ArrayList<Integer>();
 
     int perfectX;
     int perfectY;
+
     public void begin(GameState init_state, int play_num)
     {
         
@@ -46,8 +47,8 @@ public class DeperadoSnake implements Player
         }
 
        int minDist = 999;
-       int closestX;
-       int closestY;
+       int closestX = -1;
+       int closestY = -1;
        for(int i = 0; i < enemiesX.length; i++)
        {
            int xDist = Math.abs(enemiesX[i] - headX);
@@ -68,35 +69,36 @@ public class DeperadoSnake implements Player
             e = true;
         else
             e = false;
-        if(closesY > headY)
+        if(closestY > headY)
             n = true;
         else    
             n = false;
 
         
             //get possible directions to move
-        ArrayList<DirType> PossibleMoves;
-        GamePiece onTheLeft = state.getPiece(state.getSnake(my_num).head.getX()-1, state.getSnake(my_num).head.getY());
-        GamePiece onTheRight = state.getPiece(state.getSnake(my_num).head.getX()+1, state.getSnake(my_num).head.getY());
-        GamePiece Up = state.getPiece(state.getSnake(my_num).head.getX(), state.getSnake(my_num).head.getY()-1);
-        GamePiece Down = state.getPiece(state.getSnake(my_num).head.getX(), state.getSnake(my_num).head.getY()+1);
+        ArrayList<DirType> PossibleMoves = new ArrayList<DirType>();
+      
+        GamePiece onTheLeft = state.getPiece(state.getSnake(my_num).getHead().getX()-1, state.getSnake(my_num).getHead().getY());
+        GamePiece onTheRight = state.getPiece(state.getSnake(my_num).getHead().getX()+1, state.getSnake(my_num).getHead().getY());
+        GamePiece Up = state.getPiece(state.getSnake(my_num).getHead().getX(), state.getSnake(my_num).getHead().getY()-1);
+        GamePiece Down = state.getPiece(state.getSnake(my_num).getHead().getX(), state.getSnake(my_num).getHead().getY()+1);
         if(onTheLeft == null || state.isFood(onTheLeft.getX(), onTheLeft.getY())){
-            if(state.getSnake(my_num).head.getX() > 0){
+            if(state.getSnake(my_num).getHead().getX() > 0){
                 PossibleMoves.add(DirType.West);
             }
         }
         if(onTheRight == null || state.isFood(onTheRight.getX(), onTheRight.getY())){
-            if(state.getSnake(my_num).head.getX() < 15){
+            if(state.getSnake(my_num).getHead().getX() < 15){
                 PossibleMoves.add(DirType.East);
             }
         }
         if(Up == null || state.isFood(Up.getX(), Up.getY())){
-            if(state.getSnake(my_num).head.getY() > 0){
+            if(state.getSnake(my_num).getHead().getY() > 0){
                 PossibleMoves.add(DirType.North);
             }
         }
         if(Down == null || state.isFood(Down.getX(), Down.getY())){
-            if(state.getSnake(my_num).head.getY() < 15){
+            if(state.getSnake(my_num).getHead().getY() < 15){
                 PossibleMoves.add(DirType.South);
             }
         }
@@ -120,7 +122,7 @@ public class DeperadoSnake implements Player
         
          
             Random rand = new Random();
-            DirType finalMove = PossibleMoves.get(rand.nextInt(givenList.size()));
+            DirType finalMove = PossibleMoves.get(rand.nextInt(PossibleMoves.size()));
             return finalMove;
                 
             
@@ -130,7 +132,7 @@ public class DeperadoSnake implements Player
 
     public String getPlayName()
     {
-    return "Avid Snake";
+    return "Desperado Snake";
     }
      
 }

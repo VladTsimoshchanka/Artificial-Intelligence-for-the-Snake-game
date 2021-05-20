@@ -12,15 +12,22 @@ public class NeuralAI implements Player
     final int hidden_nodes = 16;
     final int hidden_layers = 2;
     float mutationRate = 0.05f;
+    float defaultMutationRate = .05f;
     NeuralNet brain;
     GameState curState;
     float[] vision;
     float[] decision;
-    int lifetime = 0;
+    int lifeTime = 0;
+    int maxLife = 200;
+
     ArrayList<FoodPiece> foodList;  //list of food positions (used to replay the best snake)
-    float fitness = 0;
+    
     FoodPiece food;
-    int score = 3;
+    public int score = 3;
+
+    float fitness = 0;
+
+    boolean dead = false;
     
 
 
@@ -29,6 +36,7 @@ public class NeuralAI implements Player
     boolean modelLoaded = false;
     ArrayList<Integer> evolution;
     
+  
     //This function is called when the game starts
     public void begin(GameState init_state, int play_num)
     {
@@ -59,8 +67,41 @@ public class NeuralAI implements Player
         
         look(state);                         //how the snake AI runs
         DirType dir = think();
+        boolean isFood;
+        HeadPiece head = state.getSnake(my_num).getHead(); 
+        int x = head.getX();
+        int y = head.getY();
+        if(dir.equals(DirType.North))
+        {
+          y++;
+        }
+        else if(dir.equals(DirType.South))
+        {
+          y--;
+        }
+        else if(dir.equals(DirType.East))
+        {
+          x++;
+        }
+        else if(dir.equals(DirType.West))
+        {
+          x--;
+        }
+        if(state.isFood(x, y))
+        {
+          isFood = true;
+          score++;
+        }
+        else{ isFood = false;}
+
+        //check dead states
+        lifeTime++;
+        if(checkCollision(curState, x,y) != null && isFood == false) 
+          dead = true;
+        else if(maxLife <= lifeTime) {
+           dead = true;
+        }
 //TODO: figure out how to assess Fitness and save out the output to use in the next game
-        lifetime++;
         return dir;
 
        // pop.calculateFitness();
@@ -81,7 +122,12 @@ public class NeuralAI implements Player
 	    return "Neural AI";
     }
 
-    void mutate() {  //mutate the snakes brain
+    void mutate(boolean accelerated) {  //mutate the snakes brain
+      if(accelerated)
+      {
+        brain.mutate(mutationRate * 2);
+      }
+      else  
         brain.mutate(mutationRate); 
      }
     
@@ -90,10 +136,10 @@ public class NeuralAI implements Player
      {  //calculate the fitness of the snake
         if(score < 10) 
         {
-           fitness = (int)(lifetime * lifetime) * (float)Math.pow(2,score); 
+           fitness = (int)(lifeTime * lifeTime) * (float)Math.pow(2,score); 
         } else 
         {
-           fitness = (int)(lifetime * lifetime);
+           fitness = (int)(lifeTime * lifeTime);
            fitness *= Math.pow(2,10);
            fitness *= (score-9);
         }
@@ -406,9 +452,22 @@ public class NeuralAI implements Player
                 return null;
           }
       }
-
-//file saving parts: change until we got something that saves
-   /* void fileSelectedIn(File selection)    //loads in a file to fill the hidden node values so as to use saved data 
+  
+  public NeuralAI clone()
+  {
+    NeuralAI clone = new NeuralAI();
+    clone.brain = brain.Clone();
+    return clone;
+  }
+      
+  NeuralAI crossover(NeuralAI parent) {  //crossover the snake with another snake
+    NeuralAI child = new NeuralAI();          //clones snake and crosses with parent
+    child.brain = brain.crossover(parent.brain);
+    return child;
+ }
+ /*
+//need to read in a file and get weight values 
+   void fileSelectedIn(File selection)    //loads in a file to fill the hidden node values so as to use saved data 
     {
         if (selection == null) 
         {

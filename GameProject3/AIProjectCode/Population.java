@@ -1,7 +1,8 @@
 package AIProjectCode;
 
+//TODO: check logic and debug this whole thing for training
 class Population 
-{
+{/*
    
     Snake[] snakes;
     Snake bestSnake;
@@ -18,7 +19,7 @@ class Population
        for(int i = 0; i < snakes.length; i++) {
           snakes[i] = new Snake(); 
        }
-       bestSnake = (Snake)snakes[0].clone();
+       bestSnake = snakes[0].clone();
        bestSnake.replay = true;
     }
     
@@ -81,7 +82,7 @@ class Population
           if(samebest > 2) {  //if the best snake has remained the same for more than 3 generations, raise the mutation rate
              mutationRate *= 2;
              samebest = 0;
-          }*/
+          }
         }
     }
     
@@ -131,5 +132,5 @@ class Population
         for(int i = 0; i < snakes.length; i++) {
           fitnessSum += snakes[i].fitness; 
        }
-    }
+    }*/
  }

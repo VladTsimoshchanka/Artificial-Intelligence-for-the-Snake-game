@@ -30,7 +30,6 @@ public class NonRandomPlayer implements Player
     
     public DirType getMove(GameState state)
     {
-        DirType choice = null;
         
         //get the head of our snake object
         Snake the_snake = state.getSnake(my_num);
@@ -57,7 +56,7 @@ public class NonRandomPlayer implements Player
         //find the nearest food
         Tup foodPos = getNearestFood(xPos, yPos, state);
         
-        return choice;
+        return moveNearestFood(xPos, yPos, foodPos, moves);
     }
     
     
@@ -144,32 +143,76 @@ public class NonRandomPlayer implements Player
         
         
         DirType current = null;
-        double nearestFdDist = Double.POSITIVE_INFINITY;
+        double currentDist = Double.POSITIVE_INFINITY;
         
-        while(posDirs.size() > 1)
+        while(posDirs.size() > 0)
         {
             DirType temp = posDirs.get(0);
             
             if(temp == DirType.North)
             {
+                double tempDist = dist(northFrom(playerX, playerY).x, northFrom(playerX, playerY).y, food.x, food.y);
                 
+                if(tempDist < currentDist)
+                {
+                    posDirs.remove(current);
+                    current = temp;
+                    currentDist = tempDist;
+                }
+                else
+                {
+                    posDirs.remove(temp);
+                }
             }
             else if(temp == DirType.East)
             {
-            
+                double tempDist = dist(eastFrom(playerX, playerY).x, eastFrom(playerX, playerY).y, food.x, food.y);
+                
+                if(tempDist < currentDist)
+                {
+                    posDirs.remove(current);
+                    current = temp;
+                    currentDist = tempDist;
+                }  
+                else
+                {
+                    posDirs.remove(temp);
+                }
             }
             else if(temp == DirType.South)
             {
-            
+                double tempDist = dist(southFrom(playerX, playerY).x, southFrom(playerX, playerY).y, food.x, food.y);
+                
+                if(tempDist < currentDist)
+                {
+                    posDirs.remove(current);
+                    current = temp;
+                    currentDist = tempDist;
+                }
+                else
+                {
+                    posDirs.remove(temp);
+                }
             }
             else    //west
             {
-            
+                double tempDist = dist(westFrom(playerX, playerY).x, westFrom(playerX, playerY).y, food.x, food.y);
+                
+                if(tempDist < currentDist)
+                {
+                    posDirs.remove(current);
+                    current = temp;
+                    currentDist = tempDist;
+                }
+                else
+                {
+                    posDirs.remove(temp);
+                }
             }
         }
 
         
-        return posDirs.get(0);
+        return current;
     }
     
     

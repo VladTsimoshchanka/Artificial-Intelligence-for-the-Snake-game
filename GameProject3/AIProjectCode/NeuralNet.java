@@ -34,6 +34,61 @@ class NeuralNet
           w.mutate(mr);             //mutates each weight index by a given threshold that may or may not be crossed by random number
        }
     }
+
+    void AdamOptimize(float learnRate) //think this works
+    {
+       for(Matrix w : weights) 
+       {
+          w.AdamOptimize(learnRate);             //mutates each weight index by a given threshold that may or may not be crossed by random number
+       }
+    }
+
+    //code from: https://github.com/jgabriellima/backpropagation/blob/master/nn.py
+    void backPropagate(float[] target)
+    {
+       if(target.length != oNodes)
+       {
+          System.out.println("there is a dimensional error in the target array");
+       }
+
+       //calculate error terms for output
+       float[] outputDeltas = new float[oNodes];
+       float[] outputM = weights[weights.length-1].toArray();
+       for(int i = 0; i < oNodes; i++)
+       {
+          float error = target[i] - outputM[i];
+          outputDeltas[i] = dSigmoid(outputM[i]) * error;
+       }
+
+       //calculate error terms for hidden nodes
+       float[][] hiddenDeltas = new float[hLayers][weights[1].toArray().length];                //check syntax
+       for(int i = 1; i < hLayers; i++)
+       {
+            float error = 0;
+            for(int j = 0; j < oNodes; j++)
+            {
+               float[][] oWeights = weights[weights.length -1].matrix;
+               error = error + output_deltas[j]* oWeights[i][j];           //not sure if this is right
+            }
+
+            float[] hWeights = weights[i].toArray();
+            for(int k = 0; k < hWeights.length; k++)
+            {
+               hidden_deltas[i][k] = dsigmoid(hWeights[k]) * error
+            }
+         
+       }
+    }
+    
+    float sigmoid(float x)
+    {
+       return Math.tanh(x);
+    }
+
+    float dSigmoid(float x)
+    {
+       return 1- Math.pow(x, 2);
+    }
     
     float[] output(float[] inputsArr) 
     {
@@ -52,8 +107,6 @@ class NeuralNet
        
        return output.toArray();                                          //outputs the matrix to an array
     }
-
-
     
     NeuralNet crossover(NeuralNet partner) 
     {

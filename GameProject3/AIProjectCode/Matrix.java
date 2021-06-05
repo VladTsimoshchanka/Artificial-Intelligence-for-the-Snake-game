@@ -110,8 +110,10 @@ class Matrix
         return n;
      }
      
+     //sigmoid function
      float relu(float x) {
-         return Math.max(0,x);
+         //return Math.max(0,x);
+         return (float)Math.tanh(x);
      }
      
      void mutate(float mutationRate) 
@@ -141,45 +143,45 @@ class Matrix
 
      void AdamOptimize(float learnRate)         //source: https://github.com/sagarvegad/Adam-optimizer/blob/master/Adam.py
      {
-        float beta1 = .9;
-        float beta2 = .999;
+        float beta1 = .9f;
+        float beta2 = .999f;
         float movingAvg = 0;
         float sqMovingAvg = 0;
-        float epsilon = Math.pow(1, -8);                    //not sure if needs to be a parameter or not
+        float epsilon = (float)Math.pow(1, -8);                    //not sure if needs to be a parameter or not
 
-      for(int i = 0; i < rows; i++) 
-      {
-         for(int j = 0; j < cols; j++) 
+         for(int i = 0; i < rows; i++) 
          {
-            int t = 0;
-               while(true)
-               {
-                  float oldVal = matrix[i][j];
-                  t+= 1;
-                  float gradVal = AdamGradFunc(oldVal);                          //computes the gradient of the stochastic function
-                  movingAvg = beta1*movingAvg + (1-beta1)*gradVal;      //updates the moving averages of the gradient
-                  sqMovingAvg = beta2*sqMovingAvg + (1-beta2)*(gradVal*gradVal);	            //updates the moving averages of the squared gradient
-                  float movingBiasCorrectedEstimate = movingAvg/(1-(beta1**t));		//calculates the bias-corrected estimates
-                  float sqMovingBiasCorrectedEstimate = sqMovingAvg/(1-(beta2**t));		//calculates the bias-corrected estimates
-                  matrix[i][j] = matrix[i][j] - (learnRate*movingBiasCorrectedEstimate)
-                                                /(math.sqrt(sqMovingBiasCorrectedEstimate + epsilon);    //updates the parameters
-                  if(matrix[i][j] == oldVal)		                                                         //checks if it is converged or not
-		                  break;
-               }
+            for(int j = 0; j < cols; j++) 
+            {
+               int t = 0;
+                  while(true)
+                  {
+                     float oldVal = matrix[i][j];
+                     t+= 1;
+                     float gradVal = AdamGradFunc(oldVal);                          //computes the gradient of the stochastic function
+                     movingAvg = beta1*movingAvg + (1-beta1)*gradVal;      //updates the moving averages of the gradient
+                     sqMovingAvg = beta2*sqMovingAvg + (1-beta2)*(gradVal*gradVal);	            //updates the moving averages of the squared gradient
+                     float movingBiasCorrectedEstimate = (float)(movingAvg/(1-Math.pow((double)beta1, (double)t)));		//calculates the bias-corrected estimates
+                     float sqMovingBiasCorrectedEstimate = (float)(sqMovingAvg/(1-Math.pow((double)beta2,(double)t)));		//calculates the bias-corrected estimates
+                     matrix[i][j] = (float)(matrix[i][j] - (learnRate*movingBiasCorrectedEstimate) /(Math.sqrt(sqMovingBiasCorrectedEstimate + epsilon)));    //updates the parameters
+                     if(matrix[i][j] == oldVal)		                                                         //checks if it is converged or not
+                           break;
+                  }
+                  
+                  ////////////////UNSURE IF NEEDS THE BOUNDING OR NOT, PROBABLY DOES
+
+
+                  //ensures bounds of values of weights
+                  if(matrix[i][j] > 1) 
+                  {                  //nakes the weight between +1 and -1
+                     matrix[i][j] = 1;
+                  }
+                  if(matrix[i][j] <-1) 
+                  {
+                  matrix[i][j] = -1;
+                  }
                
-               ////////////////UNSURE IF NEEDS THE BOUNDING OR NOT, PROBABLY DOES
-
-
-               //ensures bounds of values of weights
-               if(matrix[i][j] > 1) 
-               {                  //nakes the weight between +1 and -1
-                  matrix[i][j] = 1;
-               }
-               if(matrix[i][j] <-1) 
-               {
-                 matrix[i][j] = -1;
-               }
-            
+            }
          }
      }
      

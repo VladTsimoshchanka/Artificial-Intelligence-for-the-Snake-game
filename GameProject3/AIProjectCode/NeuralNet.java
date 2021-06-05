@@ -6,6 +6,10 @@ class NeuralNet
   
     int iNodes, hNodes, oNodes, hLayers;
     Matrix[] weights;
+    Matrix[] hiddenInput;
+    Matrix[] hiddenOutput;
+    float[][] lastChangeIWeights;
+    float[][] lastChangeOWeights; //for momentum
     
     NeuralNet(int input, int hidden, int output, int hiddenLayers) 
     {
@@ -14,12 +18,18 @@ class NeuralNet
       oNodes = output;
       hLayers = hiddenLayers;
       
+      hiddenInput = new Matrix[hLayers];
+      hiddenOutput = new Matrix[hLayers];
+
       weights = new Matrix[hLayers+1];      //makes weight matrix  for each hidden layer
       weights[0] = new Matrix(hNodes, iNodes+1);      //makes an input nodes matrix at 0
+      lastChangeIWeights = new float[hNodes][iNodes + 1];
       for(int i=1; i<hLayers; i++) {
-         weights[i] = new Matrix(hNodes,hNodes+1); 
+         weights[i] = new Matrix(hNodes,hNodes+1);
+        
       }
-      weights[weights.length-1] = new Matrix(oNodes,hNodes+1); //makes an output matrix at the end
+      weights[weights.length-1] = new Matrix(oNodes,hNodes+1); //makes the last hidden layer matrix at the end
+      lastChangeOWeights = new Float[oNodes][hNodes +  1]; //
       
       for(Matrix w : weights) 
       {
@@ -44,7 +54,7 @@ class NeuralNet
     }
 
     //code from: https://github.com/jgabriellima/backpropagation/blob/master/nn.py
-    void backPropagate(float[] target)
+    float backPropagate(float[] target, float[] output, float learnRate = .001f, float momentumFactor = .0002f)
     {
        if(target.length != oNodes)
        {
@@ -52,54 +62,147 @@ class NeuralNet
        }
 
        //calculate error terms for output
-       float[] outputDeltas = new float[oNodes];
-       float[] outputM = weights[weights.length-1].toArray();
+       float[] outputDeltas = new float[oNodes];                    //use output() from nerual net to get the output values here
        for(int i = 0; i < oNodes; i++)
        {
-          float error = target[i] - outputM[i];
-          outputDeltas[i] = dSigmoid(outputM[i]) * error;
+          float error = target[i] - output[i];
+          outputDeltas[i] = dSigmoid(output[i]) * error;
        }
 
        //calculate error terms for hidden nodes
-       float[][] hiddenDeltas = new float[hLayers][weights[1].toArray().length];                //check syntax
-       for(int i = 1; i < hLayers; i++)
+       Matrix[] hiddenDeltas = new Matrix[hLayers];       
+       for (Matrix matrix : hiddenDeltas) 
+       {
+         matrix = new Matrix(hNodes,hNodes+1);
+       } 
+       
+       //calculates error for last hidden node
+       float[][] finalHWeights = weights[weights.length -1].matrix;
+       float[][] hOuts = hiddenOutput[hLayers -1].matrix;   //holds error calculations
+       for(int i = 0; i < oNodes; i++) 
+       {
+         float error = 0;
+          for(int j = 0; j < hNodes + 1; j++)
+          {
+            error = error + output_deltas[i]*finalHWeights[i][j]; 
+           
+          }
+          for(int j = 0; j < hNodes+1; j++)
+          {
+              hOuts[i][j] = dSigmoid(hOuts[i][j]) * error;     //updates whole row of values with calculated error
+          }
+       }
+
+      hidden_deltas[hiddenDeltas.length -1]  = new Matrix(hOuts);  //updates last hidden Delta entry with values
+       
+
+      //calculates error for rest of hidden layers, excluding the final hidden layer and the first hidden layer
+       hOuts = hiddenOutput[hLayers -1].matrix; 
+       for(int i = hLayers - 2; i > -1; i--)     //backwards for each hidden layer
        {
             float error = 0;
-            for(int j = 0; j < oNodes; j++)
+            float[][] hWeights = weights[i].matrix;
+            hOuts = hiddenOutput[i].matrix;
+            float[][] hDelta = hiddenDeltas[i].matrix; 
+
+            //loops through the matrix
+            for(int j = 0; j < hNodes; j++)  //for each column of hidden nodes
             {
-               float[][] oWeights = weights[weights.length -1].matrix;
-               error = error + output_deltas[j]* oWeights[i][j];           //not sure if this is right
+               for(int k = 0; k < hNodes + 1; k++)   //for each row of hidden nodes
+               {
+                  error = error + hiddenDeltas[i+1] * hWeights[j][k];  //hiddenDeltas refernces the values from the next hidden node
+                 
+               }  
+               for(int k = 0; k < hNodes + 1; k++) 
+               {
+                   hOuts[j][k] = dSigmoid(hOuts[j][k]) * error;      //update whole row / node's values with calculated error
+               }
+
+                
             }
 
-            float[] hWeights = weights[i].toArray();
-            for(int k = 0; k < hWeights.length; k++)
-            {
-               hidden_deltas[i][k] = dsigmoid(hWeights[k]) * error
-            }
-         
+            hiddenDeltas[i] = new Matrix(hOuts);           //update the values for each hidden layer here      
        }
+
+
+       //update output weights
+       hOuts = hiddenOutput[hiddenOutput.length -1].matrix;
+       float[][] outWeights = weights[weights.length -1].matrix;
+       for(int i = 0; i < oNodes; i++)
+       {
+         for( int j = 0; j < hNodes + 1; j++)
+         {
+
+            float change = outputDeltas[i]* hOuts[i][j];
+            outWeights[i][j] = outWeights[i][j] + (learnRate*change) + (momentumFactor * lastChangeOWeights[i][j]);
+             lastChangeOWeights[i][j] = change;
+            //System.out.println((learnRate*change) + " , " + (momentumFactor*lastChangeOWeights[j][k]));
+         } 
+       }
+
+         
+         float[][] activatedInputs = hiddenInput[0].matrix;
+         float[][] firstHDeltas = hiddenDeltas[0].matrix;
+         //update input weights
+         float[][] change = hiddenDeltas.dot(activatedInputs);
+
+        for(int i = 0; i < hNodes; i++)
+       {
+         for( int j = 0; j < iNodes + 1; j++)
+         {  
+            activatedInputs[i][j] = activatedInputs[i][j] + (learnRate * change) + (momentumFactor * lastChangeIWeights[i][j]);
+         }
+       }
+       lastChangeIWeights = change;
+
+      //calculate error
+      float error = 0;
+        for(int i = 0; i < targets.length; i++)
+       {
+          error = error + .5 * Math.pow((target[i] - output[i]), 2);
+       }
+        return error
+
+
     }
     
     float sigmoid(float x)
     {
-       return Math.tanh(x);
+       return (float)Math.tanh(x);
     }
 
     float dSigmoid(float x)
     {
-       return 1- Math.pow(x, 2);
+       return (float)(1- Math.pow(x, 2));
     }
+
+   Float[][] matrixHiddenDSigmoid(float[][] input)
+   {
+      float[][] finalVals = input;
+        for(int j = 0; j < hNodes + 1; j++)  //for each column of hidden nodes
+         {
+            for(int k = 0; k < hNodes; k++)  
+            {
+               finalVals = (float)(1-Math.pow(input[i][j], 2));
+            }
+         }
+      
+      return finalVals;
+   }
+    
     
     float[] output(float[] inputsArr) 
     {
+       //input activation is weights[0]
        Matrix inputs = weights[0].singleColumnMatrixFromArray(inputsArr);  //makes a single column input value matrix
        
        Matrix curr_bias = inputs.addBias();                                   //adds a row of 1s to the input values
        
-       for(int i=0; i<hLayers; i++) {
-          Matrix hidden_ip = weights[i].dot(curr_bias);           //for each hidden layer in the matrix, dot the weights with the currentBias
-          Matrix hidden_op = hidden_ip.activate();                //makes the product matrix all positive values or 0's
-          curr_bias = hidden_op.addBias();                        //updates the currBias and adds a row of 1's to it for dot producting again
+       for(int i=0; i<hLayers; i++) 
+       {
+         hiddenInput[i] = weights[i].dot(curr_bias);           //for each hidden layer in the matrix, dot the weights with the currentBias
+          hiddenOutput[i] = hiddenInput.activate();                //makes the product matrix all positive values or 0's
+          curr_bias = hiddenOutput.addBias();                        //updates the currBias and adds a row of 1's to it for dot producting again
        }
        
        Matrix output_ip = weights[weights.length-1].dot(curr_bias);     //dot product the outputs with the current bias

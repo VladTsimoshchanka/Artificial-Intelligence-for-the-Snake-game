@@ -1,4 +1,4 @@
-package AIProjectCode;
+/*package AIProjectCode;
 
 import java.util.ArrayList;
 //for reference only
@@ -344,5 +344,5 @@ class Snake {
       if(xVel!=-SIZE) {
         xVel = SIZE; yVel = 0;
       }
-    }*/
-  }
+    }
+  }*/

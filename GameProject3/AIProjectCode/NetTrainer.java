@@ -2,13 +2,20 @@ package AIProjectCode;
 
 import ProjectThreeEngine.GameState;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import ProjectThreeEngine.*;
+
 public class NetTrainer 
 {
+    ReinforcementAI player;
     NeuralNet brain;
     float learnRate;
     float gamma;
-    public NetTrainer(NeuralNet brain, float learnRate, float gamma)
+    public NetTrainer(ReinforcementAI player, NeuralNet brain, float learnRate, float gamma)
     {
+        this.player = player;
         this.brain = brain;
         this.learnRate = learnRate;
         this.gamma = gamma;
@@ -16,14 +23,14 @@ public class NetTrainer
 
     void TrainStep(MemoryState m)
     {
-        float[] prediction = brain.getPredictionValues(m.getState());
+        float[] prediction = player.getPredictionValues(m.getState());
         float[] target = prediction.clone();
-        float[] newPreds = brain.getPredictionValues(nextState);
+        float[] newPreds = player.getPredictionValues(m.getNextState());
         float maxAction = getMaxOfArray(newPreds);
-        float predictionNew = reward + (gamma * maxAction);
+        float predictionNew = m.getReward() + (gamma * maxAction);
         
         int maxIndex = -1;
-        for(i = 0; I < maxPreds.length; i++)
+        for(int i = 0; i < newPreds.length; i++)
         {
             if(newPreds[i] == maxAction)
                 maxIndex = i;
@@ -44,14 +51,14 @@ public class NetTrainer
 
     void TrainStep(GameState state, DirType lastMove, int reward, GameState nextState, boolean isOver)
     {
-        float[] prediction = brain.getPredictionValues(state);
-        float[] newPreds = brain.getPredictionValues(nextState);
+        float[] prediction = player.getPredictionValues(state);
+        float[] newPreds = player.getPredictionValues(nextState);
         float maxAction = getMaxOfArray(newPreds);
         
-        float predictionNew = reward + (gamma * maxAction));
+        float predictionNew = reward + (gamma * maxAction);
 
         int maxIndex = -1;
-        for(i = 0; I < maxPreds.length; i++)
+        for(int i = 0; i < newPreds.length; i++)
         {
             if(newPreds[i] == maxAction)
                 maxIndex = i;
@@ -59,7 +66,7 @@ public class NetTrainer
 
         float[] target = prediction.clone();
 
-        if(!m.getIsOver())
+        if(!isOver)
         {
             target[maxIndex] = maxAction;
         }
@@ -68,14 +75,22 @@ public class NetTrainer
 
         float[] loss = MSELossFunction(target, prediction);
 
-        //backPropagation of brain
+        brain.backPropagate(target, prediction);
         brain.AdamOptimize(learnRate);
 
     }
 
     float getMaxOfArray(float[] numArray) 
     {
-        float max = Collections.max(Arrays.asList(numArray));
+        float max = -1;
+        for (float f : numArray) 
+        {
+            if(f > max)
+            {
+                max = f;
+            }   
+        }
+        return max;
   
       }
     
@@ -84,7 +99,7 @@ public class NetTrainer
         float[] mse = new float[target.length];
         for(int i = 0; i < target.length; i++)
         {
-            mse[i] = Math.pow((target[i] - prediction[i]), 2);   //I think this is correct
+            mse[i] = (float)Math.pow((target[i] - prediction[i]), 2);   //I think this is correct
         }
         return mse;
     }

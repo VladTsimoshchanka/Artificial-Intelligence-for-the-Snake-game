@@ -189,6 +189,21 @@ class NeuralNet
             }
           
          }
+
+         //nonworking size error
+         /* float[][] activatedInputs = hiddenInput[0].matrix;
+         float[][] firstHDeltas = hiddenDeltas[0].matrix;
+         //update input weights
+         float[][] change = hiddenDeltas.dot(activatedInputs);
+
+        for(int i = 0; i < hNodes; i++)
+       {
+         for( int j = 0; j < iNodes + 1; j++)
+         {  
+            activatedInputs[i][j] = activatedInputs[i][j] + (learnRate * change) + (momentumFactor * lastChangeIWeights[i][j]);
+         }
+       }
+       lastChangeIWeights = change;*/
       
 
       //calculate error

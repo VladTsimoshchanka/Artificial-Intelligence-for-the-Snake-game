@@ -561,7 +561,6 @@ public class NeuralAI implements Player
     file_out.close();
   }
 
-
  }
 
 

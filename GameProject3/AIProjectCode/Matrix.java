@@ -67,6 +67,17 @@ class Matrix
            }
         }
      }
+
+     void print()
+     {
+      for(int i = 0; i < rows; i++) 
+      {
+         for(int j = 0; j < cols; j++) 
+         {
+            System.out.print(matrix[i][j]); 
+         }
+      }
+     }
      
      Matrix singleColumnMatrixFromArray(float[] arr) 
      {
@@ -112,8 +123,8 @@ class Matrix
      
      //sigmoid function
      float relu(float x) {
-         //return Math.max(0,x);
-         return (float)Math.tanh(x);
+         return Math.max(0,x);
+         //return (float)Math.tanh(x);
      }
      
      void mutate(float mutationRate) 
@@ -172,14 +183,14 @@ class Matrix
 
 
                   //ensures bounds of values of weights
-                  if(matrix[i][j] > 1) 
+                 /* if(matrix[i][j] > 1) 
                   {                  //nakes the weight between +1 and -1
                      matrix[i][j] = 1;
                   }
                   if(matrix[i][j] <-1) 
                   {
                   matrix[i][j] = -1;
-                  }
+                  }*/
                
             }
          }

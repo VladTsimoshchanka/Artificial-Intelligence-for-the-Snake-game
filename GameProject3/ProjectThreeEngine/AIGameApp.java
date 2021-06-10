@@ -6,8 +6,6 @@
 
 package ProjectThreeEngine;
 
-import AIProjectCode.BareSnake;
-import AIProjectCode.AvidSnake;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -42,8 +40,8 @@ public class AIGameApp extends Application{
 
     public void start(Stage primaryStage){
 	//IMPORTANT : Change these lines to change who is playing!
-	Player_0 = new AvidSnake();
-	Player_1 =  new RandomPlayer();
+	Player_0 = new ReinforcementAI();
+	Player_1 =  new BareSnake();
 
 
 	//Set up the names in the state object

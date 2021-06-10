@@ -13,6 +13,8 @@ public class NetTrainer
     NeuralNet brain;
     float learnRate;
     float gamma;
+    float momentumFactor = .0002f;
+
     public NetTrainer(ReinforcementAI player, NeuralNet brain, float learnRate, float gamma)
     {
         this.player = player;
@@ -46,11 +48,18 @@ public class NetTrainer
             target[maxIndex] = m.getReward();
 
         float[] loss = MSELossFunction(target, prediction);
+    
+        brain.backPropagate(target, prediction, learnRate, momentumFactor);
+   
+        brain.AdamOptimize(learnRate);
        
     }
 
     void TrainStep(GameState state, DirType lastMove, int reward, GameState nextState, boolean isOver)
     {
+        
+    
+
         float[] prediction = player.getPredictionValues(state);
         float[] newPreds = player.getPredictionValues(nextState);
         float maxAction = getMaxOfArray(newPreds);
@@ -73,9 +82,15 @@ public class NetTrainer
         else
             target[maxIndex] = reward;
 
+        
         float[] loss = MSELossFunction(target, prediction);
 
-        brain.backPropagate(target, prediction);
+        brain.backPropagate(target, prediction, learnRate, momentumFactor);
+        for(Matrix we : brain.weights) 
+        {
+           we.print();             
+        }
+        
         brain.AdamOptimize(learnRate);
 
     }

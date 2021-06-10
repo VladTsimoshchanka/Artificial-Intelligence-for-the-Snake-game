@@ -6,6 +6,9 @@
 
 package ProjectThreeEngine;
 import AIProjectCode.BareSnake;
+import AIProjectCode.NetTrainer;
+import AIProjectCode.ReinforcementAI;
+
 import java.util.List;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -22,18 +25,25 @@ public class AIGameText{
     static GameState state;
     static GameStateWriter gs_writer;
 
-    public static void main(String[] args) throws IOException{
-	run_game("transcript.txt");
+    public static void main(String[] args) throws IOException
+	{
+		ReinforcementAI p0 = new ReinforcementAI();
+		int numGames = 1;
+		for(int i = 0; i < numGames; i++)
+		{
+			run_game("transcript.txt", p0);
+		}
+		
     }	
 
 
-    public static void run_game(String filename) throws IOException{
+    public static void run_game(String filename, Player p0) throws IOException{
 	List<GameState> the_states = new ArrayList<GameState>();
 	gs_writer = new GameStateWriter(filename);
 	
 	//IMPORTANT : Change these lines to change who is playing!
-	Player_0 = new RandomPlayer();
-	Player_1 =  new BareSnake();
+	Player_0 = p0;
+	Player_1 =  new RandomPlayer();
 
 
 	//Set up the names in the state object
@@ -53,31 +63,39 @@ public class AIGameText{
 	    state = nextTurn();
 	    the_states.add(state);
 	}
+	
+		
+	Player_0.Train(state);
+		
 
 	gs_writer.WriteGame(the_states);
 	
     }
 
 
-    static GameState nextTurn(){
-	List<Move> moves = new ArrayList<Move>();
-	
-	if (! state.isGameOver() ){
-	    DirType new_dir;
+    static GameState nextTurn()
+	{
+		List<Move> moves = new ArrayList<Move>();
+		
+		if (! state.isGameOver() )
+		{
+			DirType new_dir;
 
-	    new_dir = Player_0.getMove( new GameState(state) );
-	    if(new_dir != null){
-		moves.add(new Move(0, new_dir));
-	    }
+			new_dir = Player_0.getMove( new GameState(state) );
+			if(new_dir != null){
+			moves.add(new Move(0, new_dir));
+			}
 
-	    new_dir = Player_1.getMove( new GameState(state) );
-	    if(new_dir != null){
-		moves.add(new Move(1, new_dir));
-	    }
-	    
-	    state = GameRules.makeMoves(state, moves);
-	}
-	return state;
+			new_dir = Player_1.getMove( new GameState(state) );
+			if(new_dir != null){
+			moves.add(new Move(1, new_dir));
+			}
+			
+			state = GameRules.makeMoves(state, moves);
+		
+		}
+		
+		return state;
     }
 }
 

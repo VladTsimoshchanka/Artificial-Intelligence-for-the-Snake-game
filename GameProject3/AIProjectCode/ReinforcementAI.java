@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Random;
 
+import javax.lang.model.util.ElementScanner14;
+import javax.swing.SwingWorker.StateValue;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -50,36 +53,47 @@ public class ReinforcementAI implements Player
     //reinforcement learning
     public int reward = 0;
     int UnproductiveFrames = 0;     //number of frames where the snake hasn't collided or eaten food
-    int numGames = 0;
+ 
     float epsilon = 0;              //controls randomness
-    float gamma = 0.9f;                //discount rate
+    float gamma = 0.8f;                //discount rate
     float maxMemory = 100000;
     float batchSize = 1000;
     float learnRate = .001f;
-    float momentumFactor = .0002f;
+  
     Deque<MemoryState> memory;               //check to ensure doesn't exceed maxMemory
     //model
-    NetTrainer trainer = new NetTrainer(this, brain, learnRate, gamma);
+    NetTrainer trainer;
 
     int input_Nodes = 26;
     int outputNodes = 4;
+    boolean firstPlay = true;
     
+    //training variables
+    GameState oldState = null;
+    DirType lastMove = null;
+    int record = 0;
+    int numGames = 0;
 
     public ReinforcementAI()
     {
-      memory = new ArrayDeque<MemoryState>(); 
-      //initialize model and trainer
+        memory = new ArrayDeque<MemoryState>();
+        //Note: Brain is coded for 26 inputs from vision and head position
+        if(firstPlay)
+          brain = new NeuralNet(input_Nodes,hidden_nodes,outputNodes,hidden_layers);    //in, hidden nodes, out, hiddenlayers 
+        
+        trainer = new NetTrainer(this, brain, learnRate, gamma);
     }
     
     //This function is called when the game starts
     public void begin(GameState init_state, int play_num)
     {
-	    my_num = play_num;
-        curState = init_state;
-      if(my_num == 0)
-          oppNum = 1;
-      else
-        oppNum = 0;
+        reset();                  //sets score and frameCount to 0
+        my_num = play_num;
+          curState = init_state;
+        if(my_num == 0)
+            oppNum = 1;
+        else
+          oppNum = 0;
 
 //ADD INPUTS AND PREPROCESSING HERE
        vision = new float[input_Nodes];               //makes an array of floats for vision
@@ -88,8 +102,7 @@ public class ReinforcementAI implements Player
         ArrayList<FoodPiece> foodList;  //list of food positions (used to replay the best snake)
 
 
-//WARNING: Brain is hardcoded for 24 inputs from vision
-        brain = new NeuralNet(input_Nodes,hidden_nodes,outputNodes,hidden_layers);    //in, hidden nodes, out, hiddenlayers 
+
 
 //if have model, load up model into brain
         
@@ -102,10 +115,21 @@ public class ReinforcementAI implements Player
     //You can return null to just keep going straight
     public DirType getMove(GameState state)
     {
-        
+        //train if it isn't the first move
+        if(oldState != null)
+        {
+            remember(oldState, lastMove, reward, state, state.isGameOver());
+            trainer.TrainStep(oldState, lastMove, reward, state, state.isGameOver());
+        }
+
+
         look(state);                         //how the snake AI runs
         DirType dir = think(state);
-        
+
+        if(dir == null)  //null means move straight ahead
+        {
+          dir = state.getSnake(my_num).getHead().getDir();  
+        }
         //check if snake eats food or makes collision for gameOver
         
         int[] pos = getHeadPos(state);
@@ -123,11 +147,59 @@ public class ReinforcementAI implements Player
         if(foodCollide(state, pos[0], pos[1]))
         {
             UnproductiveFrames = 0;
+            score += 10;
             reward += 10;
+            
         }
-       
+        else if(checkCollision(state, pos[0], pos[1]) != null)    //if it hits anything the game will be over
+        {
+            reward -= 10;
+        }
+        else
+        {
+            score += 1;
+        }
+
+        Snake myS = state.getSnake(my_num);
+        if(UnproductiveFrames > 100 * myS.getBody().size())
+        {
+          state.makeGameOver();
+          reward -= 10;
+        }
+        
+        //update values for training
+        oldState = state;
+        lastMove = dir;
         
         return dir;
+
+    }
+
+    @Override
+    public void Train(GameState state)      //runs replay memory when the game is over
+    {
+      remember(oldState, lastMove, reward, state, state.isGameOver());
+      trainer.TrainStep(oldState, lastMove, reward, state, state.isGameOver());
+      trainLong();
+      numGames++;
+      System.out.println("Game: " + numGames + ", Score: " + score + ", Record: " + record);
+
+      if(score > record)        //new high score
+      {
+        System.out.println("New Record: " + score);
+        record = score;
+        try 
+        {
+          WritetoFile("AIWeights.txt");               //TODO: test reading and writing to files
+        }
+         catch (Exception e) 
+         {
+          e.printStackTrace();
+        }
+        
+      
+       
+      }
 
     }
 
@@ -175,7 +247,7 @@ public class ReinforcementAI implements Player
 
     public String getPlayName()
     {
-	    return "Neural AI";
+	    return "Reinforcement AI";
     }
 
     void mutate() {  //mutate the snakes brain
@@ -495,15 +567,18 @@ public class ReinforcementAI implements Player
       Random rand = new Random();
       if(rand.nextInt(200) < epsilon)
       {
+        System.out.println("Rendom move");
           // pick random move
           DirType cur_dir = state.getSnake(my_num).getHead().getDir();
           int r = rand.nextInt(6);
           if( cur_dir == DirType.North || cur_dir == DirType.South ){
-              if( r == 0){
-            return DirType.East;
+              if( r == 0)
+              {
+                return DirType.East;
               }
-              if( r == 1){
-            return DirType.West;
+              if( r == 1)
+              {
+                return DirType.West;
               }
               return null;
           }
@@ -514,13 +589,14 @@ public class ReinforcementAI implements Player
               if( r == 1){
             return DirType.South;
               }
-              return null;
+              return null;          
           }
       }
       else
       {
         //use brain
           decision = brain.output(vision);
+         
           int maxIndex = 0;
           float max = 0;
           for(int i = 0; i < decision.length; i++) 
@@ -567,15 +643,11 @@ public class ReinforcementAI implements Player
         }
      }
 
-     void train()
-     {
-        
-
-         //uses agent and game
-     }
+   
      //trains on long term memory
      void trainLong()                         //needs work
      {
+
        ArrayList<MemoryState> miniSample = new ArrayList<MemoryState>();
         if(memory.size() >= batchSize)
         {
@@ -595,7 +667,6 @@ public class ReinforcementAI implements Player
         }
         else
           miniSample = new ArrayList<MemoryState>(memory);
-//TODO: Makle Trainer.TrainStep(take in a memorystate)
           for(MemoryState m : miniSample)
           {
             trainer.TrainStep(m);
@@ -605,6 +676,7 @@ public class ReinforcementAI implements Player
      //trains on short term memory
      public void trainShort(GameState state, DirType lastMove, int reward, GameState nextState, boolean isOver)
      {
+     
            trainer.TrainStep(state, lastMove, reward, nextState, isOver);
             
 
@@ -619,6 +691,8 @@ public class ReinforcementAI implements Player
      {
          numGames++;
      }
+
+
 
 
 
@@ -640,7 +714,7 @@ public class ReinforcementAI implements Player
        }
 
       //loops through most hidden layers
-       for(i = 1; i < hidden_layers; i++)
+       for(int i = 1; i < hidden_layers; i++)
        {
          float[][] hWeights = modelWeights[i].matrix;
 
@@ -706,7 +780,7 @@ public class ReinforcementAI implements Player
     for(int j = 0; j < hidden_nodes; j++) //for each row of matrix
     {
         float[] wRows = convertRow(st);                 //get separated float values from file
-        for(int k = 0; k < hidden_Nodes + 1; k++)  
+        for(int k = 0; k < hidden_nodes + 1; k++)  
         {
             hiddenWeights[j][k] = wRows[k];         //loads up the layer's value with 
           
@@ -722,7 +796,7 @@ public class ReinforcementAI implements Player
   for(int i = 0; i < outputNodes; i++) //for each row of matrix
   {
     float[] wRows = convertRow(st);                 //get separated float values from file
-    for(int j = 0; j < hidden_Nodes + 1; j++)  
+    for(int j = 0; j < hidden_nodes + 1; j++)  
     {
         outputWeights[i][j] = wRows[j];         //loads up the layer's value with 
       
@@ -732,7 +806,7 @@ public class ReinforcementAI implements Player
   }
   newBrain[0] = new Matrix(outputWeights);
 
-  brain = newBrain;   //finally, set the new Brain to work with
+  brain = new NeuralNet(input_Nodes, hidden_nodes, outputNodes, hidden_layers, newBrain);
   reader.close();;
     
 }

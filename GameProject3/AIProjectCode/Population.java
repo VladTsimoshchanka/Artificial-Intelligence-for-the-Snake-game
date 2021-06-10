@@ -1,6 +1,6 @@
 package AIProjectCode;
 
-//TODO: check logic and debug this whole thing for training
+//check logic and debug this whole thing for training
 class Population 
 {/*
    

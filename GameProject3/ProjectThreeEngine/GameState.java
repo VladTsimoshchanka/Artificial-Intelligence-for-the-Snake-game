@@ -48,7 +48,7 @@ public class GameState {
 	return game_over;
     }
 
-    void makeGameOver(){
+    public void makeGameOver(){
 	game_over = true;
     }
 

@@ -9,6 +9,8 @@ public interface Player{
     public DirType getMove(GameState state);
 
     public String getPlayName();
+
+    public default void Train(GameState state){};
 }
 
    

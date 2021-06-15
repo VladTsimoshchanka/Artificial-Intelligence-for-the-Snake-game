@@ -31,7 +31,7 @@ public class NetTrainer
         float maxAction = getMaxOfArray(newPreds);
         float predictionNew = m.getReward() + (gamma * maxAction);
         
-        int maxIndex = -1;
+        int maxIndex = 0;
         for(int i = 0; i < newPreds.length; i++)
         {
             if(newPreds[i] == maxAction)
@@ -51,7 +51,7 @@ public class NetTrainer
     
         brain.backPropagate(target, prediction, learnRate, momentumFactor);
    
-        brain.AdamOptimize(learnRate);
+        //brain.AdamOptimize(learnRate);
        
     }
 
@@ -66,10 +66,10 @@ public class NetTrainer
         
         float predictionNew = reward + (gamma * maxAction);
 
-        int maxIndex = -1;
+        int maxIndex = 0;
         for(int i = 0; i < newPreds.length; i++)
         {
-            if(newPreds[i] == maxAction)
+            if(newPreds[i] >= maxAction)
                 maxIndex = i;
         }
 
@@ -86,18 +86,18 @@ public class NetTrainer
         float[] loss = MSELossFunction(target, prediction);
 
         brain.backPropagate(target, prediction, learnRate, momentumFactor);
-        for(Matrix we : brain.weights) 
-        {
-           we.print();             
-        }
-        
-        brain.AdamOptimize(learnRate);
+       // for(Matrix we : brain.weights) 
+        //{
+          // we.print();             
+        //}
+        //use error to get the gradientfunction
+       // brain.AdamOptimize(learnRate);
 
     }
 
     float getMaxOfArray(float[] numArray) 
     {
-        float max = -1;
+        float max = -999;
         for (float f : numArray) 
         {
             if(f > max)

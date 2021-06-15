@@ -28,7 +28,7 @@ public class AIGameText{
     public static void main(String[] args) throws IOException
 	{
 		ReinforcementAI p0 = new ReinforcementAI();
-		int numGames = 1;
+		int numGames = 100;
 		for(int i = 0; i < numGames; i++)
 		{
 			run_game("transcript.txt", p0);

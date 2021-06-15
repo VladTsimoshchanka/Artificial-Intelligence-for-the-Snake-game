@@ -167,7 +167,7 @@ class Matrix
                int t = 0;
                   while(true)
                   {
-                     float oldVal = matrix[i][j];
+                     float oldVal = matrix[i][j];  //theta
                      t+= 1;
                      float gradVal = AdamGradFunc(oldVal);                          //computes the gradient of the stochastic function
                      movingAvg = beta1*movingAvg + (1-beta1)*gradVal;      //updates the moving averages of the gradient
@@ -175,6 +175,7 @@ class Matrix
                      float movingBiasCorrectedEstimate = (float)(movingAvg/(1-Math.pow((double)beta1, (double)t)));		//calculates the bias-corrected estimates
                      float sqMovingBiasCorrectedEstimate = (float)(sqMovingAvg/(1-Math.pow((double)beta2,(double)t)));		//calculates the bias-corrected estimates
                      matrix[i][j] = (float)(matrix[i][j] - (learnRate*movingBiasCorrectedEstimate) /(Math.sqrt(sqMovingBiasCorrectedEstimate + epsilon)));    //updates the parameters
+                    
                      if(matrix[i][j] == oldVal)		                                                         //checks if it is converged or not
                            break;
                   }
@@ -183,14 +184,14 @@ class Matrix
 
 
                   //ensures bounds of values of weights
-                 /* if(matrix[i][j] > 1) 
+                  if(matrix[i][j] > 1) 
                   {                  //nakes the weight between +1 and -1
                      matrix[i][j] = 1;
                   }
                   if(matrix[i][j] <-1) 
                   {
                   matrix[i][j] = -1;
-                  }*/
+                  }
                
             }
          }
